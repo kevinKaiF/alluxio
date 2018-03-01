@@ -69,8 +69,12 @@ public class AsyncCacheRequestManager {
   public void submitRequest(Protocol.AsyncCacheRequest request) {
     long blockId = request.getBlockId();
     long blockLength = request.getLength();
+    // Added by Bin
+    LOG.info("blockID {}, len {}, current size {}", blockId, blockLength, mPendingRequests.size());
+    // Added by Bin end
     if (mPendingRequests.putIfAbsent(blockId, request) != null) {
       // This block is already planned.
+      LOG.info("blockID {} already planned, return", blockId);
       return;
     }
     try {
@@ -97,7 +101,7 @@ public class AsyncCacheRequestManager {
           result =
               cacheBlockFromRemoteWorker(blockId, blockLength, sourceAddress, openUfsBlockOptions);
         }
-        LOG.debug("Result of async caching block {}: {}", blockId, result);
+        LOG.info("Result of async caching block {}: {}", blockId, result);
         mPendingRequests.remove(blockId);
       });
     } catch (Exception e) {
